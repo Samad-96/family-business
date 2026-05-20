@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import type { Property, AcquisitionCost, MaintenanceCost, Lease } from '../../types'
 import {
-  ArrowRight, MapPin, Ruler, Calendar, DollarSign,
+  ArrowRight, Calendar, DollarSign,
   Plus, Wrench, FileText, Home, ChevronLeft
 } from 'lucide-react'
 
@@ -108,8 +108,6 @@ export default function PropertyDetail() {
   const totalAcq   = acqCosts.reduce((s, c) => s + (c.amount_usd || 0), 0)
   const totalMaint = maintCosts.reduce((s, c) => s + (c.amount_usd || 0), 0)
   const totalInvested = (property.purchase_price_usd || 0) + totalAcq + totalMaint
-
-  const activeLease = leases.find(l => l.status === 'active')
 
   return (
     <div className="min-h-screen bg-gray-50" dir="rtl">
