@@ -312,7 +312,7 @@ export default function Analytics() {
                 <BarChart data={monthlyTrend} margin={{ top: 4, right: 4, left: -22, bottom: 0 }}>
                   <XAxis dataKey="month" tick={{ fontSize: 9 }} />
                   <YAxis tick={{ fontSize: 9 }} />
-                  <Tooltip formatter={(v: number | undefined) => [`$${(v ?? 0).toLocaleString()}`, '']} />
+                  <Tooltip formatter={(v: unknown) => [`$${Number(v ?? 0).toLocaleString()}`, '']} />
                   <Bar dataKey="expected" name="متوقع"  fill="#e5e7eb" radius={[3,3,0,0]} />
                   <Bar dataKey="actual"   name="محصّل"  fill="#f59e0b" radius={[3,3,0,0]} />
                 </BarChart>
@@ -417,7 +417,7 @@ export default function Analytics() {
                 <LineChart data={forecastData} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
                   <XAxis dataKey="year" tick={{ fontSize: 9 }} />
                   <YAxis tick={{ fontSize: 9 }} />
-                  <Tooltip formatter={(v: number | undefined) => [`$${v ?? 0}K`, 'القيمة']} />
+                  <Tooltip formatter={(v: unknown) => [`$${Number(v ?? 0)}K`, 'القيمة']} />
                   <Line type="monotone" dataKey="value" stroke="#f59e0b" strokeWidth={2.5} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
