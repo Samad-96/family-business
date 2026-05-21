@@ -10,15 +10,7 @@ import {
 const typeLabels: Record<string, string> = {
   land: 'أرض', flat: 'شقة', shop: 'محل', building: 'بناء',
 }
-const statusLabels: Record<string, string> = {
-  owned: 'مملوك', rented_out: 'مؤجر', for_sale: 'للبيع', sold: 'مباع',
-}
-const statusColors: Record<string, string> = {
-  owned: 'bg-blue-100 text-blue-800',
-  rented_out: 'bg-green-100 text-green-800',
-  for_sale: 'bg-amber-100 text-amber-800',
-  sold: 'bg-gray-100 text-gray-500',
-}
+
 const acqTypeLabels: Record<string, string> = {
   notary: 'كاتب العدل', registration: 'تسجيل', agent_fee: 'عمولة وسيط',
   renovation: 'تجديد', other: 'أخرى',
