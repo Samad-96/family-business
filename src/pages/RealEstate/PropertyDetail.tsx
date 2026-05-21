@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabase'
 import type { Property, AcquisitionCost, MaintenanceCost, Lease } from '../../types'
 import {
   ArrowRight, Calendar, DollarSign,
-  Plus, Wrench, FileText, Home, ChevronLeft
+  Plus, Wrench, FileText, Home, ChevronLeft, Pencil, Banknote
 } from 'lucide-react'
 
 const typeLabels: Record<string, string> = {
@@ -121,9 +121,22 @@ export default function PropertyDetail() {
           <ArrowRight size={20} />
         </button>
         <h1 className="text-base font-bold flex-1 truncate">{property.label}</h1>
-        <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${statusColors[property.status]}`}>
-          {statusLabels[property.status]}
-        </span>
+        <div className="flex items-center gap-2">
+          {property.status !== 'sold' && (
+            <button
+              onClick={() => navigate(`/real-estate/${id}/record-sale`)}
+              className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white text-xs font-medium px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
+            >
+              <Banknote size={13} /> بيع
+            </button>
+          )}
+          <button
+            onClick={() => navigate(`/real-estate/${id}/edit`)}
+            className="p-1.5 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+          >
+            <Pencil size={16} />
+          </button>
+        </div>
       </div>
 
       <div className="p-4 max-w-lg mx-auto pb-12">
