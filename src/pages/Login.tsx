@@ -13,7 +13,7 @@ export default function Login() {
 
   // If already logged in, go straight to the app
   useEffect(() => {
-    if (session) navigate('/real-estate', { replace: true })
+    if (session) navigate('/', { replace: true })
   }, [session])
 
   async function handleLogin(e: React.FormEvent) {
@@ -27,7 +27,7 @@ export default function Login() {
       setError('البريد الإلكتروني أو كلمة المرور غير صحيحة')
       setLoading(false)
     } else {
-      navigate('/real-estate', { replace: true })
+      navigate('/', { replace: true })
     }
   }
 

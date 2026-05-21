@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import type { Property } from '../../types'
-import { Plus, Home, MapPin, DollarSign, LogOut } from 'lucide-react'
+import { Plus, Home, MapPin, DollarSign, LogOut, ArrowRight } from 'lucide-react'
 
 const statusLabels: Record<string, string> = {
   owned:      'مملوك',
@@ -53,7 +53,14 @@ export default function PropertiesList() {
       {/* Header */}
       <div className="bg-gray-900 text-white px-4 py-4 sticky top-0 z-10">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => navigate('/')}
+              className="p-1.5 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+              title="الرئيسية"
+            >
+              <ArrowRight size={20} />
+            </button>
             <button
               onClick={signOut}
               className="p-1.5 rounded-full hover:bg-white/10 transition-colors cursor-pointer"

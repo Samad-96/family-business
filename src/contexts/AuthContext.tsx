@@ -11,6 +11,7 @@ interface Profile {
 interface AuthContextType {
   session:  Session | null
   profile:  Profile | null
+  modules:  string[]
   loading:  boolean
   signOut:  () => Promise<void>
 }
@@ -18,6 +19,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   session: null,
   profile: null,
+  modules: [],
   loading: true,
   signOut: async () => {},
 })
@@ -25,19 +27,22 @@ const AuthContext = createContext<AuthContextType>({
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
+  const [modules, setModules] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
 
   async function loadProfile(userId: string, email?: string) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
+    const [profileRes, permsRes] = await Promise.all([
+      supabase.from('profiles').select('*').eq('id', userId).single(),
+      supabase.from('user_permissions').select('module').eq('user_id', userId),
+    ])
 
-    if (data) {
-      setProfile(data)
+    // Load permissions
+    if (permsRes.data) setModules(permsRes.data.map(p => p.module))
+
+    // Load or auto-create profile
+    if (profileRes.data) {
+      setProfile(profileRes.data)
     } else {
-      // Auto-create profile on first login
       const name = email?.split('@')[0] || 'مستخدم'
       const { data: created } = await supabase
         .from('profiles')
@@ -58,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
       if (session) loadProfile(session.user.id, session.user.email)
-      else { setProfile(null); setLoading(false) }
+      else { setProfile(null); setModules([]); setLoading(false) }
     })
 
     return () => subscription.unsubscribe()
@@ -74,7 +79,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ session, profile, loading, signOut }}>
+    <AuthContext.Provider value={{ session, profile, modules, loading, signOut }}>
       {children}
     </AuthContext.Provider>
   )
