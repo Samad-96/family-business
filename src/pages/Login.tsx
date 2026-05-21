@@ -37,7 +37,7 @@ export default function Login() {
       {/* Logo / App name */}
       <div className="text-center mb-10">
         <div className="text-5xl mb-4">🏠</div>
-        <h1 className="text-2xl font-bold text-gray-900">عائلة عبد الفتاح</h1>
+        <h1 className="text-2xl font-bold text-gray-900">عائلة ايهاب عبد الفتاح</h1>
         <p className="text-gray-400 text-sm mt-1">إدارة الأعمال العائلية</p>
       </div>
 
