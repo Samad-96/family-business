@@ -12,7 +12,10 @@ export interface Property {
   purchase_date: string | null
   purchase_price_usd: number | null
   notes: string | null
+  created_by: string | null
   created_at: string
+  changed_by: string | null
+  changed_at: string | null
 }
 
 export interface AcquisitionCost {
@@ -23,7 +26,10 @@ export interface AcquisitionCost {
   amount_syp: number | null
   cost_date: string
   description: string | null
+  created_by: string | null
   created_at: string
+  changed_by: string | null
+  changed_at: string | null
 }
 
 export interface MaintenanceCost {
@@ -34,7 +40,10 @@ export interface MaintenanceCost {
   amount_syp: number | null
   cost_date: string
   description: string | null
+  created_by: string | null
   created_at: string
+  changed_by: string | null
+  changed_at: string | null
 }
 
 export interface Lease {
@@ -50,7 +59,10 @@ export interface Lease {
   furnishing_cost_usd: number | null
   status: 'active' | 'ended' | 'pending'
   notes: string | null
+  created_by: string | null
   created_at: string
+  changed_by: string | null
+  changed_at: string | null
 }
 
 export interface RentPayment {
@@ -62,7 +74,10 @@ export interface RentPayment {
   amount_syp: number | null
   status: 'paid' | 'pending' | 'late' | 'partial'
   notes: string | null
+  created_by: string | null
   created_at: string
+  changed_by: string | null
+  changed_at: string | null
 }
 
 export interface Sale {
@@ -75,5 +90,8 @@ export interface Sale {
   agent_fee_usd: number
   buyer_name: string | null
   notes: string | null
+  created_by: string | null
   created_at: string
+  changed_by: string | null
+  changed_at: string | null
 }

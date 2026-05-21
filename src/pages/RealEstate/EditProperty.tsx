@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { useAuth } from '../../contexts/AuthContext'
 import { ArrowRight, Save, Trash2 } from 'lucide-react'
 
 const typeOptions = [
@@ -20,6 +21,7 @@ const statusOptions = [
 export default function EditProperty() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { session } = useAuth()
   const [saving, setSaving]   = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState<string | null>(null)
@@ -64,6 +66,7 @@ export default function EditProperty() {
     setError(null)
 
     const { error } = await supabase.from('properties').update({
+      changed_by:         session?.user.id,
       label:              form.label.trim(),
       type:               form.type,
       city:               form.city.trim()               || null,
