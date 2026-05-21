@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { useAuth } from '../../contexts/AuthContext'
 import { ArrowRight, Save } from 'lucide-react'
 
 export default function RecordSale() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { session } = useAuth()
   const [saving, setSaving] = useState(false)
   const [error, setError]   = useState<string | null>(null)
   const [propertyLabel, setPropertyLabel] = useState('')
@@ -42,6 +44,7 @@ export default function RecordSale() {
     const [saleRes] = await Promise.all([
       supabase.from('sales').insert({
         property_id:    id,
+        created_by:     session?.user.id,
         sale_date:      form.sale_date,
         sale_price_usd: salePrice,
         notary_fee_usd: notaryFee,

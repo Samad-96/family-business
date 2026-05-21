@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { useAuth } from '../../contexts/AuthContext'
 import { ArrowRight, Save } from 'lucide-react'
 
 const statusOptions = [
@@ -13,6 +14,7 @@ const statusOptions = [
 export default function AddRentPayment() {
   const { id, leaseId } = useParams()
   const navigate = useNavigate()
+  const { session } = useAuth()
   const [saving, setSaving]           = useState(false)
   const [error, setError]             = useState<string | null>(null)
   const [monthlyRent, setMonthlyRent] = useState<number>(0)
@@ -48,6 +50,7 @@ export default function AddRentPayment() {
 
     const { error } = await supabase.from('rent_payments').insert({
       lease_id:   leaseId,
+      created_by: session?.user.id,
       due_date:   form.due_date,
       paid_date:  form.status === 'paid' || form.status === 'partial' ? form.paid_date : null,
       amount_usd: Number(form.amount_usd),

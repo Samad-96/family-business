@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { useAuth } from '../../contexts/AuthContext'
 import type { Property } from '../../types'
-import { Plus, Home, MapPin, DollarSign } from 'lucide-react'
+import { Plus, Home, MapPin, DollarSign, LogOut } from 'lucide-react'
 
 const statusLabels: Record<string, string> = {
   owned:      'مملوك',
@@ -27,6 +28,7 @@ const statusColors: Record<string, string> = {
 
 export default function PropertiesList() {
   const navigate = useNavigate()
+  const { profile, signOut } = useAuth()
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -49,14 +51,26 @@ export default function PropertiesList() {
     <div className="min-h-screen bg-gray-50" dir="rtl">
 
       {/* Header */}
-      <div className="bg-gray-900 text-white px-4 py-5 flex items-center justify-between sticky top-0 z-10">
-        <h1 className="text-xl font-bold tracking-wide">العقارات</h1>
-        <button
-          onClick={() => navigate('/real-estate/add')}
-          className="bg-amber-500 hover:bg-amber-600 active:scale-95 text-white rounded-full p-2 transition-all"
-        >
-          <Plus size={22} />
-        </button>
+      <div className="bg-gray-900 text-white px-4 py-4 sticky top-0 z-10">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={signOut}
+              className="p-1.5 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+              title="تسجيل الخروج"
+            >
+              <LogOut size={17} />
+            </button>
+            {profile && <span className="text-xs text-gray-400">{profile.name}</span>}
+          </div>
+          <h1 className="text-xl font-bold tracking-wide">العقارات</h1>
+          <button
+            onClick={() => navigate('/real-estate/add')}
+            className="bg-amber-500 hover:bg-amber-600 active:scale-95 text-white rounded-full p-2 transition-all cursor-pointer"
+          >
+            <Plus size={22} />
+          </button>
+        </div>
       </div>
 
       {/* Content */}

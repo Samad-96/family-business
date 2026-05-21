@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { useAuth } from '../../contexts/AuthContext'
 import { ArrowRight, Save } from 'lucide-react'
 
 const categoryOptions = [
@@ -15,6 +16,7 @@ const categoryOptions = [
 export default function AddMaintenanceCost() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { session } = useAuth()
   const [saving, setSaving] = useState(false)
   const [error, setError]   = useState<string | null>(null)
 
@@ -37,6 +39,7 @@ export default function AddMaintenanceCost() {
 
     const { error } = await supabase.from('maintenance_costs').insert({
       property_id: id,
+      created_by:  session?.user.id,
       category:    form.category,
       amount_usd:  Number(form.amount_usd),
       cost_date:   form.cost_date,

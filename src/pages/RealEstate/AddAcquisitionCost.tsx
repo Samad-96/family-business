@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { useAuth } from '../../contexts/AuthContext'
 import { ArrowRight, Save } from 'lucide-react'
 
 const typeOptions = [
@@ -14,6 +15,7 @@ const typeOptions = [
 export default function AddAcquisitionCost() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { session } = useAuth()
   const [saving, setSaving] = useState(false)
   const [error, setError]   = useState<string | null>(null)
 
@@ -36,6 +38,7 @@ export default function AddAcquisitionCost() {
 
     const { error } = await supabase.from('acquisition_costs').insert({
       property_id: id,
+      created_by:  session?.user.id,
       type:        form.type,
       amount_usd:  Number(form.amount_usd),
       cost_date:   form.cost_date,

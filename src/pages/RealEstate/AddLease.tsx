@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { useAuth } from '../../contexts/AuthContext'
 import { ArrowRight, Save } from 'lucide-react'
 
 export default function AddLease() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { session } = useAuth()
   const [saving, setSaving] = useState(false)
   const [error, setError]   = useState<string | null>(null)
 
@@ -33,6 +35,7 @@ export default function AddLease() {
 
     const { error } = await supabase.from('leases').insert({
       property_id:         id,
+      created_by:          session?.user.id,
       tenant_name:         form.tenant_name.trim(),
       tenant_phone:        form.tenant_phone.trim()        || null,
       start_date:          form.start_date,
