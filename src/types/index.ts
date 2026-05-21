@@ -14,6 +14,7 @@ export interface Property {
   notes: string | null
   created_by: string | null
   created_at: string
+  annual_appreciation_pct: number | null
   changed_by: string | null
   changed_at: string | null
 }

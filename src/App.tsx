@@ -13,6 +13,7 @@ import AddLease from './pages/RealEstate/AddLease'
 import LeaseDetail from './pages/RealEstate/LeaseDetail'
 import AddRentPayment from './pages/RealEstate/AddRentPayment'
 import EditRentPayment from './pages/RealEstate/EditRentPayment'
+import Analytics from './pages/RealEstate/Analytics'
 
 // Shorthand: protected + requires a specific business module
 function RE({ children }: { children: React.ReactNode }) {
@@ -31,6 +32,7 @@ export default function App() {
 
         {/* Real-estate — requires real_estate permission */}
         <Route path="/real-estate"                                                    element={<RE><PropertiesList /></RE>} />
+        <Route path="/real-estate/analytics"                                          element={<RE><Analytics /></RE>} />
         <Route path="/real-estate/add"                                                element={<RE><AddProperty /></RE>} />
         <Route path="/real-estate/:id"                                                element={<RE><PropertyDetail /></RE>} />
         <Route path="/real-estate/:id/edit"                                           element={<RE><EditProperty /></RE>} />

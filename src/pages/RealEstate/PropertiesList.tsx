@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../contexts/AuthContext'
 import type { Property } from '../../types'
-import { Plus, Home, MapPin, DollarSign, LogOut, ArrowRight } from 'lucide-react'
+import { Plus, Home, MapPin, DollarSign, LogOut, ArrowRight, BarChart2 } from 'lucide-react'
 
 const statusLabels: Record<string, string> = {
   owned:      'مملوك',
@@ -71,12 +71,21 @@ export default function PropertiesList() {
             {profile && <span className="text-xs text-gray-400">{profile.name}</span>}
           </div>
           <h1 className="text-xl font-bold tracking-wide">العقارات</h1>
-          <button
-            onClick={() => navigate('/real-estate/add')}
-            className="bg-amber-500 hover:bg-amber-600 active:scale-95 text-white rounded-full p-2 transition-all cursor-pointer"
-          >
-            <Plus size={22} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate('/real-estate/analytics')}
+              className="p-1.5 rounded-full hover:bg-white/10 transition-colors cursor-pointer"
+              title="التحليلات"
+            >
+              <BarChart2 size={20} />
+            </button>
+            <button
+              onClick={() => navigate('/real-estate/add')}
+              className="bg-amber-500 hover:bg-amber-600 active:scale-95 text-white rounded-full p-2 transition-all cursor-pointer"
+            >
+              <Plus size={22} />
+            </button>
+          </div>
         </div>
       </div>
 
