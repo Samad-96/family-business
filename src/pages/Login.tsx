@@ -1,11 +1,20 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function Login() {
+  const navigate = useNavigate()
+  const { session } = useAuth()
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
   const [loading,  setLoading]  = useState(false)
   const [error,    setError]    = useState<string | null>(null)
+
+  // If already logged in, go straight to the app
+  useEffect(() => {
+    if (session) navigate('/real-estate', { replace: true })
+  }, [session])
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
@@ -17,8 +26,9 @@ export default function Login() {
     if (error) {
       setError('البريد الإلكتروني أو كلمة المرور غير صحيحة')
       setLoading(false)
+    } else {
+      navigate('/real-estate', { replace: true })
     }
-    // On success, AuthContext updates session → ProtectedRoute redirects automatically
   }
 
   return (
