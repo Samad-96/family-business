@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, ChevronDown } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   LineChart, Line,
@@ -38,6 +38,22 @@ interface PA {  // PropertyAnalytics shape
 const typeLabels:   Record<string, string> = { flat: 'شقة', shop: 'محل', building: 'بناء', land: 'أرض' }
 const statusLabels: Record<string, string> = { owned: 'مملوك', rented_out: 'مؤجر', for_sale: 'للبيع', sold: 'مباع' }
 const BAR_COLORS = ['#f59e0b', '#3b82f6', '#10b981', '#8b5cf6']
+
+const TYPE_ORDER = ['building', 'flat', 'shop', 'land']
+
+const typeCls: Record<string, string> = {
+  building: 'bg-purple-100 text-purple-700',
+  flat:     'bg-blue-100   text-blue-700',
+  shop:     'bg-amber-100  text-amber-700',
+  land:     'bg-green-100  text-green-700',
+}
+
+const PROP_GROUPS = [
+  { status: 'rented_out', label: 'مؤجر',  headerCls: 'bg-green-600' },
+  { status: 'owned',      label: 'مملوك', headerCls: 'bg-blue-600'  },
+  { status: 'for_sale',   label: 'للبيع', headerCls: 'bg-amber-500' },
+  { status: 'sold',       label: 'مباع',  headerCls: 'bg-gray-500'  },
+] as const
 
 function yearsOwned(purchaseDate: string | null): number {
   if (!purchaseDate) return 0
@@ -100,6 +116,11 @@ export default function Analytics() {
   const [props, setProps] = useState<PA[]>([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<Tab>('overview')
+  const [propCollapsed, setPropCollapsed] = useState<Record<string, boolean>>({})
+
+  function togglePropGroup(status: string) {
+    setPropCollapsed(prev => ({ ...prev, [status]: !prev[status] }))
+  }
 
   useEffect(() => {
     supabase
@@ -189,21 +210,6 @@ export default function Analytics() {
 
     return { month: label, expected, actual }
   })
-
-  // ── Per-property ROI (rented only) ─────────────────────────────────────────
-
-  const propertyROI = props
-    .filter(p => p.status === 'rented_out')
-    .map(p => {
-      const invested   = totalInvested(p)
-      const annualRent = (activeLease(p)?.monthly_rent_usd ?? 0) * 12
-      const maint      = maintenanceLast12(p)
-      const propNOI    = annualRent - maint
-      const cr         = invested > 0 ? (propNOI / invested) * 100 : 0
-      const payback    = propNOI > 0 ? invested / propNOI : null
-      return { label: p.label, type: p.type, invested, annualRent, maint, noi: propNOI, capRate: cr, payback }
-    })
-    .sort((a, b) => b.capRate - a.capRate)
 
   // ── Forecast (next 10 years) ────────────────────────────────────────────────
 
@@ -366,41 +372,165 @@ export default function Analytics() {
 
         {/* ══ PROPERTIES ════════════════════════════════════════════════════════ */}
         {tab === 'properties' && (
-          <>
-            <p className="text-xs text-gray-400 px-1">العقارات المؤجرة — مرتبة حسب معدل العائد (Cap Rate)</p>
+          <div className="space-y-3">
+            {PROP_GROUPS.map(group => {
+              const groupProps = props
+                .filter(p => p.status === group.status)
+                .sort((a, b) =>
+                  TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type) ||
+                  a.label.localeCompare(b.label, 'ar'),
+                )
 
-            {propertyROI.map((p, i) => (
-              <div key={i} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-                <div className="flex items-start justify-between gap-2 mb-3">
-                  <p className="text-sm font-bold text-gray-900 flex-1 leading-snug">{p.label}</p>
-                  <span className={`text-lg font-bold shrink-0 ${p.capRate >= 5 ? 'text-green-600' : p.capRate >= 3 ? 'text-amber-600' : 'text-red-500'}`}>
-                    {p.capRate.toFixed(2)}%
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs">
-                  <StatRow label="رأس المال"      value={fmt(p.invested)}   />
-                  <StatRow label="الإيجار السنوي" value={fmt(p.annualRent)} />
-                  <StatRow label="الصيانة (12ش)"  value={fmt(p.maint)}      />
-                  <StatRow label="NOI الصافي"      value={fmt(p.noi)}        highlight />
-                  <StatRow label="فترة الاسترداد" value={p.payback ? `${p.payback.toFixed(1)} سنة` : '—'} />
-                  <StatRow label="النوع"           value={typeLabels[p.type] ?? p.type} />
-                </div>
-              </div>
-            ))}
+              if (groupProps.length === 0) return null
 
-            {/* Non-rented properties */}
-            <Section title="العقارات غير المؤجرة">
-              {props.filter(p => p.status !== 'rented_out').map(p => (
-                <div key={p.property_id} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-800 truncate">{p.label}</p>
-                    <p className="text-xs text-gray-400">{typeLabels[p.type]} · {statusLabels[p.status]}</p>
-                  </div>
-                  <p className="text-xs font-semibold text-gray-600 shrink-0 mr-2">{fmt(totalInvested(p))}</p>
+              const isCollapsed = !!propCollapsed[group.status]
+
+              // Per-group header metric
+              let headerMeta: string | null = null
+              if (group.status === 'rented_out') {
+                const totalMonthly = groupProps
+                  .reduce((s, p) => s + (activeLease(p)?.monthly_rent_usd ?? 0), 0)
+                const avgCap = groupProps.reduce((s, p) => {
+                  const inv = totalInvested(p)
+                  const noi = (activeLease(p)?.monthly_rent_usd ?? 0) * 12 - maintenanceLast12(p)
+                  return s + (inv > 0 ? noi / inv : 0)
+                }, 0) / groupProps.length
+                headerMeta = `$${totalMonthly.toLocaleString()}/شهر · عائد ${(avgCap * 100).toFixed(1)}%`
+              } else if (group.status === 'owned') {
+                const idle = groupProps.reduce((s, p) => s + totalInvested(p), 0)
+                headerMeta = `راكد ${fmt(idle)}`
+              } else if (group.status === 'for_sale') {
+                const total = groupProps.reduce((s, p) => s + totalInvested(p), 0)
+                headerMeta = fmt(total)
+              }
+
+              return (
+                <div key={group.status}>
+                  {/* Collapsible group header */}
+                  <button
+                    onClick={() => togglePropGroup(group.status)}
+                    className={`w-full flex items-center justify-between px-4 py-2.5 rounded-2xl ${group.headerCls} text-white cursor-pointer`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-sm">{group.label}</span>
+                      <span className="bg-white/25 text-xs px-2 py-0.5 rounded-full font-medium">
+                        {groupProps.length}
+                      </span>
+                      {headerMeta && (
+                        <span className="text-xs text-white/80">{headerMeta}</span>
+                      )}
+                    </div>
+                    <ChevronDown
+                      size={16}
+                      className={`transition-transform duration-200 ${isCollapsed ? '-rotate-90' : ''}`}
+                    />
+                  </button>
+
+                  {/* Group content */}
+                  {!isCollapsed && (
+                    <div className="mt-1.5 space-y-2">
+
+                      {/* ── Rented: full ROI cards sorted by cap rate ── */}
+                      {group.status === 'rented_out' && (
+                        [...groupProps]
+                          .sort((a, b) => {
+                            const capOf = (p: PA) => {
+                              const inv = totalInvested(p)
+                              const noi = (activeLease(p)?.monthly_rent_usd ?? 0) * 12 - maintenanceLast12(p)
+                              return inv > 0 ? noi / inv : 0
+                            }
+                            return capOf(b) - capOf(a)
+                          })
+                          .map(p => {
+                            const invested   = totalInvested(p)
+                            const annualRent = (activeLease(p)?.monthly_rent_usd ?? 0) * 12
+                            const maint      = maintenanceLast12(p)
+                            const propNOI    = annualRent - maint
+                            const cr         = invested > 0 ? (propNOI / invested) * 100 : 0
+                            const payback    = propNOI > 0 ? invested / propNOI : null
+
+                            return (
+                              <div key={p.property_id} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+                                <div className="flex items-start justify-between gap-2 mb-3">
+                                  <div>
+                                    <p className="text-sm font-bold text-gray-900 leading-snug">{p.label}</p>
+                                    <p className="text-xs text-gray-400 mt-0.5">
+                                      <span className={`inline-block text-xs px-1.5 py-0.5 rounded-md font-medium ml-1 ${typeCls[p.type]}`}>
+                                        {typeLabels[p.type]}
+                                      </span>
+                                      ${activeLease(p)?.monthly_rent_usd?.toLocaleString()}/شهر
+                                    </p>
+                                  </div>
+                                  <span className={`text-lg font-bold shrink-0 ${cr >= 5 ? 'text-green-600' : cr >= 3 ? 'text-amber-600' : 'text-red-500'}`}>
+                                    {cr.toFixed(2)}%
+                                  </span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs">
+                                  <StatRow label="رأس المال"      value={fmt(invested)}   />
+                                  <StatRow label="الإيجار السنوي" value={fmt(annualRent)} />
+                                  <StatRow label="الصيانة (12ش)"  value={fmt(maint)}      />
+                                  <StatRow label="NOI الصافي"      value={fmt(propNOI)}   highlight />
+                                  <StatRow label="فترة الاسترداد" value={payback ? `${payback.toFixed(1)} سنة` : '—'} />
+                                  <StatRow label="القيمة المقدرة" value={fmt(estimatedValue(p))} />
+                                </div>
+                              </div>
+                            )
+                          })
+                      )}
+
+                      {/* ── Owned / For Sale / Sold: compact analytical rows ── */}
+                      {group.status !== 'rented_out' && (
+                        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                          {groupProps.map((p, idx) => {
+                            const invested = totalInvested(p)
+                            const estVal   = estimatedValue(p)
+                            const gainPct  = invested > 0 ? ((estVal - invested) / invested) * 100 : 0
+
+                            return (
+                              <div
+                                key={p.property_id}
+                                className={`flex items-center gap-3 px-4 py-3 ${idx < groupProps.length - 1 ? 'border-b border-gray-50' : ''}`}
+                              >
+                                {/* Type badge */}
+                                <span className={`text-xs px-2 py-0.5 rounded-lg font-medium shrink-0 ${typeCls[p.type]}`}>
+                                  {typeLabels[p.type]}
+                                </span>
+
+                                {/* Name + invested→estimated */}
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs font-medium text-gray-800 truncate">{p.label}</p>
+                                  {invested > 0 && (
+                                    <p className="text-xs text-gray-400 mt-0.5">
+                                      {fmt(invested)} → {fmt(estVal)}
+                                    </p>
+                                  )}
+                                </div>
+
+                                {/* Gain % */}
+                                {gainPct > 0 && (
+                                  <span className="text-xs font-bold text-green-600 shrink-0">
+                                    +{gainPct.toFixed(1)}%
+                                  </span>
+                                )}
+
+                                {/* Opportunity cost note for idle non-land */}
+                                {group.status === 'owned' && p.type !== 'land' && avgRent > 0 && (
+                                  <span className="text-xs text-amber-600 font-medium shrink-0">
+                                    {fmt(avgRent)}/شهر ضائع
+                                  </span>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+
+                    </div>
+                  )}
                 </div>
-              ))}
-            </Section>
-          </>
+              )
+            })}
+          </div>
         )}
 
         {/* ══ FORECAST ══════════════════════════════════════════════════════════ */}
