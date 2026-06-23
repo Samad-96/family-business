@@ -220,7 +220,7 @@ export default function CostsAnalysis() {
                 <Pie data={donutData} cx="50%" cy="50%" innerRadius={52} outerRadius={82} dataKey="value" paddingAngle={2}>
                   {donutData.map((d, i) => <Cell key={i} fill={d.color} />)}
                 </Pie>
-                <Tooltip formatter={(v: number) => `$${fmt(v, 2)}`} />
+                <Tooltip formatter={(v) => `$${fmt(Number(v), 2)}`} />
               </PieChart>
             </ResponsiveContainer>
             <div className="space-y-2 mt-1">
@@ -250,7 +250,7 @@ export default function CostsAnalysis() {
               <BarChart data={perApiary} layout="vertical" margin={{ top: 4, right: 50, bottom: 4, left: isAr ? 10 : 0 }}>
                 <XAxis type="number" tick={{ fontSize: 10 }} tickFormatter={v => `$${fmt(v, 0)}`} />
                 <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={isAr ? 100 : 90} />
-                <Tooltip formatter={(v: number, name: string) => [`$${fmt(v, 2)}`, name]} />
+                <Tooltip formatter={(v, name) => [`$${fmt(Number(v), 2)}`, String(name)]} />
                 <Legend iconSize={10} wrapperStyle={{ fontSize: 11 }} />
                 <Bar dataKey="transport"   stackId="s" fill={COLORS.transport}   name={t('Transport', 'نقل')} radius={[0,0,0,0]} />
                 <Bar dataKey="host"        stackId="s" fill={COLORS.host}        name={t('Host / Land', 'الأرض')} />
@@ -272,7 +272,7 @@ export default function CostsAnalysis() {
               <BarChart data={costPerKgChart} layout="vertical" margin={{ top: 4, right: 50, bottom: 4, left: 0 }}>
                 <XAxis type="number" tick={{ fontSize: 10 }} tickFormatter={v => `$${fmt(v, 2)}`} />
                 <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={90} />
-                <Tooltip formatter={(v: number) => [`$${fmt(v, 2)}/kg`, t('Cost/kg', 'تكلفة/كغ')]} />
+                <Tooltip formatter={(v) => [`$${fmt(Number(v), 2)}/kg`, t('Cost/kg', 'تكلفة/كغ')]} />
                 <Bar dataKey="value" fill="#f59e0b" radius={[0, 3, 3, 0]} name={t('Cost/kg', 'تكلفة/كغ')} />
               </BarChart>
             </ResponsiveContainer>

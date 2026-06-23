@@ -253,7 +253,7 @@ export default function ApiaryDetail() {
                 <Pie data={costPieData} cx="50%" cy="50%" innerRadius={48} outerRadius={78} dataKey="value" paddingAngle={2}>
                   {costPieData.map((c, i) => <Cell key={i} fill={c.color} />)}
                 </Pie>
-                <Tooltip formatter={(v: number) => `$${fmt(v, 2)}`} />
+                <Tooltip formatter={(v) => `$${fmt(Number(v), 2)}`} />
               </PieChart>
             </ResponsiveContainer>
             <div className="space-y-2">

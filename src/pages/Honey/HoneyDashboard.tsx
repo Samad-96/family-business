@@ -244,7 +244,7 @@ export default function HoneyDashboard() {
                       cx="50%" cy="50%" innerRadius={55} outerRadius={88} dataKey="value" paddingAngle={2}>
                       {costCategories.map((c, i) => <Cell key={i} fill={c.color} />)}
                     </Pie>
-                    <Tooltip formatter={(v: number) => `$${fmt(v, 2)}`} />
+                    <Tooltip formatter={(v) => `$${fmt(Number(v), 2)}`} />
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="space-y-2.5 mt-1">
@@ -284,7 +284,7 @@ export default function HoneyDashboard() {
                 <BarChart data={harvestChart} margin={{ top: 4, right: 4, bottom: 4, left: -20 }}>
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} unit=" kg" />
-                  <Tooltip formatter={(v: number) => [`${fmt(v, 1)} kg`, t('Harvest', 'الحصاد')]} />
+                  <Tooltip formatter={(v) => [`${fmt(Number(v), 1)} kg`, t('Harvest', 'الحصاد')]} />
                   <Bar dataKey="kg" fill="#f59e0b" radius={[4, 4, 0, 0]} name={t('Harvest', 'الحصاد')} />
                 </BarChart>
               </ResponsiveContainer>
@@ -302,7 +302,7 @@ export default function HoneyDashboard() {
             <BarChart data={healthChart} margin={{ top: 4, right: 4, bottom: 4, left: -20 }}>
               <XAxis dataKey="label" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
-              <Tooltip formatter={(v: number) => [v, t('Hives', 'خلايا')]} />
+              <Tooltip formatter={(v) => [Number(v), t('Hives', 'خلايا')]} />
               <Bar dataKey="count" radius={[4, 4, 0, 0]} name={t('Hives', 'خلايا')}>
                 {healthChart.map((entry, i) => <Cell key={i} fill={entry.color} />)}
               </Bar>

@@ -261,7 +261,7 @@ export default function HiveDetail() {
                 <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
                 <XAxis dataKey="date" tick={{ fontSize: 10 }} />
                 <YAxis domain={[0, 5]} ticks={[1, 2, 3, 4, 5]} tick={{ fontSize: 11 }} />
-                <Tooltip formatter={(v: number) => [v, t('Health', 'الصحة')]} />
+                <Tooltip formatter={(v) => [Number(v), t('Health', 'الصحة')]} />
                 <ReferenceLine y={3} stroke="#f59e0b" strokeDasharray="4 4" />
                 <Line type="monotone" dataKey="health" stroke="#f59e0b" strokeWidth={2.5}
                   dot={{ fill: '#f59e0b', strokeWidth: 0, r: 4 }} activeDot={{ r: 6 }} name={t('Health', 'الصحة')} />
