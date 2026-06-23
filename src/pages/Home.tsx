@@ -15,11 +15,11 @@ const BUSINESSES = [
   {
     id:          'honey',
     label:       'تجارة العسل',
-    description: 'إدارة مخزون العسل والمبيعات',
+    description: 'تحليلات المنحل — الخلايا، التكاليف، الحصاد',
     location:    'سوريا 🇸🇾',
     icon:        '🍯',
     route:       '/honey',
-    built:       false,
+    built:       true,
   },
   {
     id:          'butcher',

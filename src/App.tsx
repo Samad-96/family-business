@@ -14,6 +14,13 @@ import LeaseDetail from './pages/RealEstate/LeaseDetail'
 import AddRentPayment from './pages/RealEstate/AddRentPayment'
 import EditRentPayment from './pages/RealEstate/EditRentPayment'
 import Analytics from './pages/RealEstate/Analytics'
+import HoneyLayout from './pages/Honey/HoneyLayout'
+import HoneyDashboard from './pages/Honey/HoneyDashboard'
+import ApiariesList from './pages/Honey/ApiariesList'
+import ApiaryDetail from './pages/Honey/ApiaryDetail'
+import HivesList from './pages/Honey/HivesList'
+import HiveDetail from './pages/Honey/HiveDetail'
+import CostsAnalysis from './pages/Honey/CostsAnalysis'
 
 // Shorthand: protected + requires a specific business module
 function RE({ children }: { children: React.ReactNode }) {
@@ -43,6 +50,16 @@ export default function App() {
         <Route path="/real-estate/:id/lease/:leaseId"                                 element={<RE><LeaseDetail /></RE>} />
         <Route path="/real-estate/:id/lease/:leaseId/add-payment"                    element={<RE><AddRentPayment /></RE>} />
         <Route path="/real-estate/:id/lease/:leaseId/payment/:paymentId/edit"        element={<RE><EditRentPayment /></RE>} />
+
+        {/* Honey — requires honey permission, language context via HoneyLayout */}
+        <Route path="/honey" element={<HoneyLayout />}>
+          <Route index                  element={<HoneyDashboard />} />
+          <Route path="apiaries"        element={<ApiariesList />} />
+          <Route path="apiaries/:id"    element={<ApiaryDetail />} />
+          <Route path="hives"           element={<HivesList />} />
+          <Route path="hives/:id"       element={<HiveDetail />} />
+          <Route path="costs"           element={<CostsAnalysis />} />
+        </Route>
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
