@@ -10,6 +10,7 @@ import RecordSale from './pages/RealEstate/RecordSale'
 import AddAcquisitionCost from './pages/RealEstate/AddAcquisitionCost'
 import AddMaintenanceCost from './pages/RealEstate/AddMaintenanceCost'
 import AddLease from './pages/RealEstate/AddLease'
+import EditLease from './pages/RealEstate/EditLease'
 import LeaseDetail from './pages/RealEstate/LeaseDetail'
 import AddRentPayment from './pages/RealEstate/AddRentPayment'
 import EditRentPayment from './pages/RealEstate/EditRentPayment'
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="/real-estate/:id/add-maintenance-cost"                           element={<RE><AddMaintenanceCost /></RE>} />
         <Route path="/real-estate/:id/add-lease"                                      element={<RE><AddLease /></RE>} />
         <Route path="/real-estate/:id/lease/:leaseId"                                 element={<RE><LeaseDetail /></RE>} />
+        <Route path="/real-estate/:id/lease/:leaseId/edit"                            element={<RE><EditLease /></RE>} />
         <Route path="/real-estate/:id/lease/:leaseId/add-payment"                    element={<RE><AddRentPayment /></RE>} />
         <Route path="/real-estate/:id/lease/:leaseId/payment/:paymentId/edit"        element={<RE><EditRentPayment /></RE>} />
 

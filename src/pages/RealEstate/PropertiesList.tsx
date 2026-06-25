@@ -21,10 +21,16 @@ interface PropertyRow {
 
 const GROUPS = [
   { status: 'rented_out', label: 'مؤجر',  headerCls: 'bg-green-600', },
-  { status: 'owned',      label: 'مملوك', headerCls: 'bg-blue-600',  },
+  { status: 'owned',      label: 'شاغر',  headerCls: 'bg-blue-600',  },
   { status: 'for_sale',   label: 'للبيع', headerCls: 'bg-amber-500', },
   { status: 'sold',       label: 'مباع',  headerCls: 'bg-gray-500',  },
 ] as const
+
+function effectiveStatus(p: PropertyRow): string {
+  if (p.leases.some(l => l.status === 'active')) return 'rented_out'
+  if (p.status === 'rented_out') return 'owned'
+  return p.status
+}
 
 const TYPE_ORDER = ['building', 'flat', 'shop', 'land']
 
@@ -69,7 +75,7 @@ export default function PropertiesList() {
   const totalMonthlyIncome = properties
     .flatMap(p => p.leases.filter(l => l.status === 'active'))
     .reduce((s, l) => s + l.monthly_rent_usd, 0)
-  const rentedCount = properties.filter(p => p.status === 'rented_out').length
+  const rentedCount = properties.filter(p => p.leases.some(l => l.status === 'active')).length
 
   return (
     <div className="min-h-screen bg-gray-50" dir="rtl">
@@ -143,7 +149,7 @@ export default function PropertiesList() {
         {GROUPS.map(group => {
           // Sort within group: building → flat → shop → land, then alphabetically
           const groupProps = properties
-            .filter(p => p.status === group.status)
+            .filter(p => effectiveStatus(p) === group.status)
             .sort((a, b) =>
               TYPE_ORDER.indexOf(a.type) - TYPE_ORDER.indexOf(b.type) ||
               a.label.localeCompare(b.label, 'ar'),

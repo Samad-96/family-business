@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../../lib/supabase'
+import { useAuth } from '../../contexts/AuthContext'
 import type { Lease, RentPayment } from '../../types'
-import { ArrowRight, Plus, CheckCircle, Clock, AlertCircle, MinusCircle } from 'lucide-react'
+import { ArrowRight, Plus, CheckCircle, Clock, AlertCircle, MinusCircle, Pencil } from 'lucide-react'
 
 const paymentStatusConfig: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   paid:    { label: 'مدفوع',    color: 'bg-green-100 text-green-700',  icon: <CheckCircle size={14} /> },
@@ -20,6 +21,7 @@ function months(start: string): number {
 export default function LeaseDetail() {
   const { id, leaseId } = useParams()
   const navigate = useNavigate()
+  const { session } = useAuth()
 
   const [lease, setLease]       = useState<Lease | null>(null)
   const [payments, setPayments] = useState<RentPayment[]>([])
@@ -36,6 +38,24 @@ export default function LeaseDetail() {
   }
 
   useEffect(() => { load() }, [leaseId])
+
+  async function handleEnd() {
+    if (!confirm('هل تريد إنهاء هذا العقد؟')) return
+    const today = new Date().toISOString().split('T')[0]
+    await supabase.from('leases').update({
+      status:     'ended',
+      end_date:   lease?.end_date || today,
+      changed_by: session?.user.id,
+    }).eq('lease_id', leaseId)
+    load()
+  }
+
+  async function handleDelete() {
+    if (!confirm('سيتم حذف العقد وجميع دفعاته نهائياً. هل أنت متأكد؟')) return
+    await supabase.from('rent_payments').delete().eq('lease_id', leaseId)
+    await supabase.from('leases').delete().eq('lease_id', leaseId)
+    navigate(`/real-estate/${id}`)
+  }
 
   if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-400" dir="rtl">جاري التحميل...</div>
   if (!lease)  return <div className="min-h-screen flex items-center justify-center text-red-400"  dir="rtl">عقد الإيجار غير موجود</div>
@@ -61,6 +81,12 @@ export default function LeaseDetail() {
         <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${lease.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
           {lease.status === 'active' ? 'نشط' : 'منتهي'}
         </span>
+        <button
+          onClick={() => navigate(`/real-estate/${id}/lease/${leaseId}/edit`)}
+          className="p-1.5 rounded-full hover:bg-white/10 transition-colors"
+        >
+          <Pencil size={16} />
+        </button>
       </div>
 
       <div className="p-4 max-w-lg mx-auto pb-12 space-y-5">
@@ -155,6 +181,24 @@ export default function LeaseDetail() {
               })}
             </div>
           )}
+        </div>
+
+        {/* Actions */}
+        <div className="space-y-2 pt-2">
+          {lease.status === 'active' && (
+            <button
+              onClick={handleEnd}
+              className="w-full py-3 text-amber-600 text-sm font-medium hover:bg-amber-50 rounded-2xl border border-amber-200 transition-colors cursor-pointer"
+            >
+              إنهاء العقد
+            </button>
+          )}
+          <button
+            onClick={handleDelete}
+            className="w-full py-3 text-red-500 text-sm font-medium hover:bg-red-50 rounded-2xl border border-red-100 transition-colors cursor-pointer"
+          >
+            حذف العقد وجميع دفعاته
+          </button>
         </div>
 
       </div>
